@@ -67,7 +67,6 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             api(libs.koin.core)
-
             implementation(libs.bundles.ktor)
             implementation(libs.bundles.coil)
         }
@@ -102,9 +101,20 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    buildFeatures {
+        buildConfig = true
+    }
     buildTypes {
-        getByName("release") {
+        debug {
+            buildConfigField("String", "BASE_URL", "\"https://openlibrary.org/\"")
+        }
+        release {
             isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            buildConfigField("String", "BASE_URL", "\"https://openlibrary.org/\"")
         }
     }
     compileOptions {

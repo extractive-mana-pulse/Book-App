@@ -135,7 +135,7 @@ fun BlurredImageBackground(
                 shape = RoundedCornerShape(8.dp),
                 elevation = CardDefaults.elevatedCardElevation(
                     defaultElevation = 15.dp
-                )
+                ),
             ) {
                 AnimatedContent(
                     targetState = imageLoadResult

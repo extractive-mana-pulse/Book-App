@@ -25,6 +25,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -73,11 +75,21 @@ fun BookListScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val pagerState = rememberPagerState { 2 }
-    val searchResultsListState = rememberLazyListState()
     val favoriteBooksListState = rememberLazyListState()
+    val searchResultsListState = rememberLazyListState()
+    val searchResultListScrollPosition = rememberSaveable { mutableStateOf(0) }
+    val favoriteBooksListScrollPosition = rememberSaveable { mutableStateOf(0) }
 
-    LaunchedEffect(state.searchResults) {
-        searchResultsListState.animateScrollToItem(0)
+    LaunchedEffect(state.searchResults, state.favoriteBooks) {
+        searchResultsListState.animateScrollToItem(searchResultListScrollPosition.value)
+        favoriteBooksListState.animateScrollToItem(favoriteBooksListScrollPosition.value)
+    }
+    LaunchedEffect(searchResultsListState.firstVisibleItemIndex) {
+        searchResultListScrollPosition.value = searchResultsListState.firstVisibleItemIndex
+    }
+
+    LaunchedEffect(favoriteBooksListState.firstVisibleItemIndex) {
+        favoriteBooksListScrollPosition.value = favoriteBooksListState.firstVisibleItemIndex
     }
 
     LaunchedEffect(state.selectedTabIndex) {
@@ -181,9 +193,7 @@ fun BookListScreen(
                     ) {
                         when(pageIndex) {
                             0 -> {
-                                if(state.isLoading) {
-                                    CircularProgressIndicator()
-                                } else {
+                                if(state.isLoading) CircularProgressIndicator() else {
                                     when {
                                         state.errorMessage != null -> {
                                             Text(
